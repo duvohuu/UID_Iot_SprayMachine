@@ -1,0 +1,21 @@
+{
+  "name": "iot-spray-machine",
+  "private": true,
+  "scripts": {
+    "dev": "cd Front-end && yarn dev",
+    "dev:backend": "cd Back-end && npm run dev",
+    "dev:all": "concurrently -n \"FRONT,BACK\" -c \"bgMagenta.bold,bgBlue.bold\" \"yarn dev\" \"yarn dev:backend\" --kill-others-on-fail",
+    "build": "cd Front-end && yarn build",
+    "preview": "cd Front-end && yarn preview",
+    "install:frontend": "cd Front-end && yarn install",
+    "install:backend": "cd Back-end && npm install",
+    "install:all": "concurrently \"yarn install:frontend\" \"yarn install:backend\"",
+    "clean": "concurrently \"cd Front-end && rm -rf node_modules\" \"cd Back-end && rm -rf node_modules\"",
+    "clean:install": "yarn clean && yarn install:all"
+    ,
+    "update:network": "./update-network.sh"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
