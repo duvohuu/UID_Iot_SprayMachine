@@ -11,21 +11,18 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 
 /**
  * ========================================
- * CREATE USER SCRIPT (Tổng quát)
+ * CREATE USER SCRIPT
  * ========================================
- * Usage:
- *   cd Back-end
- *   node scripts/createUser.js
- * 
  * Modify USER_DATA object below to create different users
  */
 
 // CẤU HÌNH USER TẠI ĐÂY
 const USER_DATA = {
-    username: 'NgocHiep',              // Tên đăng nhập
-    email: 'NgocHiep@gmail.com',     // Email
-    password: '123456',              // Mật khẩu (sẽ được hash tự động)
-    role: 'user'                     // 'admin' hoặc 'user'
+    userId: 'ADMIN001',
+    username: 'Dư',                     
+    email: 'du.vohuudu@gmail.com',      
+    password: '123456',               
+    role: 'admin'                     
 };
 
 const createUser = async () => {
@@ -72,15 +69,12 @@ const createUser = async () => {
             process.exit(0);
         }
 
-        // Generate unique userId
-        const userId = `USER${Date.now()}`;
-
         // Create new user
         const newUser = new User({
-            userId,
+            userId: USER_DATA.userId,
             username: USER_DATA.username,
             email: USER_DATA.email,
-            password: USER_DATA.password,  // Will be hashed by pre-save hook
+            password: USER_DATA.password,  
             role: USER_DATA.role || 'user',
             isActive: true
         });
@@ -92,7 +86,7 @@ const createUser = async () => {
         console.log('🆔 UserID:', newUser.userId);
         console.log('👤 Username:', newUser.username);
         console.log('📧 Email:', newUser.email);
-        console.log('🔑 Password:', USER_DATA.password);  // Show original password (not hashed)
+        console.log('🔑 Password:', USER_DATA.password);  
         console.log('🎭 Role:', newUser.role);
         console.log('✅ Active:', newUser.isActive);
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');

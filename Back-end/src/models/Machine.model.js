@@ -29,10 +29,6 @@ const MachineSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-    ip: {
-        type: String,
-        required: true
-    },
     port: {
         type: Number,
         default: 502

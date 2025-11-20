@@ -4,15 +4,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import Machine from '../src/models/Machine.model.js';
 
-// ✅ FIX: Get current directory và load .env từ Back-end/
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '../.env') });
-
-/**
- * Script để thêm 1 máy mới vào database
- * Usage: cd Back-end && node scripts/createMachine.js
- */
 
 const addMachine = async () => {
     try {
@@ -28,15 +22,14 @@ const addMachine = async () => {
         await mongoose.connect(process.env.MONGO_URI);
         console.log('✅ MongoDB Connected');
 
-        // CẤU HÌNH MÁY MỚI Ở ĐÂY
+        // CẤU HÌNH MÁY MỚI
         const newMachine = {
             machineId: 'SPRAY001',           
             name: 'Máy Phun Sơn',          
             type: 'Spray Machine',           
-            location: 'Workshop B',          
-            ip: '192.168.0.155',             
+            location: 'Ngoc Hiep Factory',               
             port: 5000,
-            userId:              
+            userId: 'USER001',             
             status: 'offline',
             isConnected: false
         };
