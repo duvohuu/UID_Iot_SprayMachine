@@ -2,14 +2,22 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
     Container, 
-    Grid, 
+    Grid2 as Grid,
     CircularProgress, 
     Alert, 
     Button, 
     Typography, 
-    Box 
+    Box,
+    useMediaQuery,
+    useTheme,
+    IconButton,
+    Collapse
 } from '@mui/material';
-import { ArrowBack } from '@mui/icons-material';
+import { 
+    ArrowBack, 
+    ExpandMore as ExpandMoreIcon,
+    ExpandLess as ExpandLessIcon
+} from '@mui/icons-material';
 import { useMachine } from '../hooks/useMachine';
 import { useSprayRealtime } from '../hooks/useSprayRealtime';
 import { useMachineSocketEvents } from '../hooks/useSocketEvents';
@@ -19,18 +27,20 @@ import SprayMachineDataDisplay from '../components/sprayMachine/SprayMachineData
 
 /**
  * ========================================
- * SPRAY MACHINE PAGE COMPONENT
+ * SPRAY MACHINE PAGE COMPONENT (RESPONSIVE)
  * ========================================
  * Page chính hiển thị thông tin chi tiết Spray Machine
- * Bao gồm:
- * - Header với back button
- * - Panel trái: Kết nối, trạng thái realtime
- * - Panel phải: Charts, daily data, statistics
+ * Tối ưu cho cả Desktop và Mobile
  */
 const SprayMachinePage = () => {
     const { machineId } = useParams();
     const navigate = useNavigate();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    
     const [machineRealtime, setMachineRealtime] = useState(null);
+    const [panelExpanded, setPanelExpanded] = useState(!isMobile); // Mobile: collapsed by default
 
     // ==================== FETCH MACHINE INFO ====================
     const {
@@ -54,9 +64,6 @@ const SprayMachinePage = () => {
 
     // ==================== SOCKET EVENT CALLBACKS ====================
 
-    /**
-     * Xử lý khi nhận update machine status từ socket
-     */
     const handleMachineUpdate = useCallback((update) => {
         console.log(`[${machine?.name}] Machine status updated:`, update);
         setMachineRealtime(prevMachine => ({
@@ -67,18 +74,10 @@ const SprayMachinePage = () => {
         }));
     }, [machine]);
 
-    /**
-     * Xử lý khi nhận realtime data từ socket (nếu có)
-     */
     const handleRealtimeUpdate = useCallback((data) => {
         console.log(`[${machine?.name}] Realtime data update:`, data);
-        // Socket data sẽ trigger re-fetch trong useSprayRealtime hook
-        // Hoặc có thể xử lý trực tiếp ở đây nếu cần
     }, [machine]);
 
-    /**
-     * Xử lý khi daily data reset (6h sáng)
-     */
     const handleDailyReset = useCallback(() => {
         console.log(`[${machine?.name}] Daily data reset at 6AM`);
         refreshAllData();
@@ -86,7 +85,6 @@ const SprayMachinePage = () => {
 
     // ==================== SETUP SOCKET LISTENERS ====================
     
-    // Use custom hook for socket events
     useMachineSocketEvents({
         machineId,
         onMachineUpdate: handleMachineUpdate,
@@ -96,9 +94,6 @@ const SprayMachinePage = () => {
 
     // ==================== EFFECTS ====================
 
-    /**
-     * Set initial machine realtime state
-     */
     useEffect(() => {
         if (machine) {
             setMachineRealtime(machine);
@@ -106,9 +101,6 @@ const SprayMachinePage = () => {
         }
     }, [machine]);
 
-    /**
-     * Log spray data updates
-     */
     useEffect(() => {
         if (realtimeData) {
             console.log('🔄 [SprayMachinePage] Realtime data updated:', {
@@ -119,21 +111,31 @@ const SprayMachinePage = () => {
         }
     }, [realtimeData]);
 
+    // Auto collapse panel when switching to mobile
+    useEffect(() => {
+        setPanelExpanded(!isMobile);
+    }, [isMobile]);
+
     // ==================== RENDER LOADING STATE ====================
 
     if (machineLoading || sprayLoading) {
         return (
-            <Container maxWidth="xl" sx={{ mt: 4 }}>
+            <Container maxWidth="xl" sx={{ mt: { xs: 2, md: 4 }, px: { xs: 1, sm: 2 } }}>
                 <Box sx={{ 
                     display: 'flex', 
                     justifyContent: 'center', 
                     alignItems: 'center', 
-                    height: '60vh',
+                    height: { xs: '50vh', md: '60vh' },
                     flexDirection: 'column',
                     gap: 2
                 }}>
-                    <CircularProgress size={60} />
-                    <Typography variant="h6" color="text.secondary">
+                    <CircularProgress size={isSmallMobile ? 40 : 60} />
+                    <Typography 
+                        variant={isSmallMobile ? "body1" : "h6"} 
+                        color="text.secondary"
+                        textAlign="center"
+                        px={2}
+                    >
                         Đang tải dữ liệu Spray Machine...
                     </Typography>
                 </Box>
@@ -145,17 +147,18 @@ const SprayMachinePage = () => {
 
     if (machineError || sprayError) {
         return (
-            <Container maxWidth="xl" sx={{ mt: 4 }}>
-                <Box sx={{ mb: 3 }}>
+            <Container maxWidth="xl" sx={{ mt: { xs: 2, md: 4 }, px: { xs: 1, sm: 2 } }}>
+                <Box sx={{ mb: 2 }}>
                     <Button
                         variant="outlined"
                         startIcon={<ArrowBack />}
                         onClick={() => navigate('/status')}
+                        size={isSmallMobile ? "small" : "medium"}
                     >
-                        Quay lại
+                        {isSmallMobile ? "Quay lại" : "Quay lại trang chủ"}
                     </Button>
                 </Box>
-                <Alert severity="error" sx={{ mb: 3 }}>
+                <Alert severity="error" sx={{ mb: 2 }}>
                     <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>
                         ❌ Lỗi tải dữ liệu
                     </Typography>
@@ -166,7 +169,8 @@ const SprayMachinePage = () => {
                 <Button 
                     variant="contained" 
                     onClick={() => window.location.reload()}
-                    sx={{ mt: 2 }}
+                    fullWidth={isSmallMobile}
+                    size={isSmallMobile ? "small" : "medium"}
                 >
                     Tải lại trang
                 </Button>
@@ -178,7 +182,7 @@ const SprayMachinePage = () => {
 
     if (!machine) {
         return (
-            <Container maxWidth="xl" sx={{ mt: 4 }}>
+            <Container maxWidth="xl" sx={{ mt: { xs: 2, md: 4 }, px: { xs: 1, sm: 2 } }}>
                 <Alert severity="warning">
                     <Typography variant="body1">
                         ⚠️ Không tìm thấy máy với ID: {machineId}
@@ -189,6 +193,8 @@ const SprayMachinePage = () => {
                     onClick={() => navigate('/status')}
                     sx={{ mt: 2 }}
                     startIcon={<ArrowBack />}
+                    fullWidth={isSmallMobile}
+                    size={isSmallMobile ? "small" : "medium"}
                 >
                     Quay về trang chủ
                 </Button>
@@ -199,62 +205,165 @@ const SprayMachinePage = () => {
     // ==================== RENDER MAIN CONTENT ====================
 
     return (
-        <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+        <Container 
+            maxWidth="xl" 
+            sx={{ 
+                mt: { xs: 2, sm: 3, md: 4 }, 
+                mb: { xs: 2, sm: 3, md: 4 },
+                px: { xs: 1, sm: 2, md: 3 }
+            }}
+        >
             {/* Header with back button */}
             <MachineHeader machine={machine} />
 
-            {/* Main Grid Layout */}
-            <Grid container spacing={3}>
-                {/* Left Column - Machine Info & Panel */}
-                <Grid size={{ xs: 2.5, md: 2.5 }}>
-                    {/* Spray Machine Panel */}
-                    <SprayMachinePanel
-                        machine={machineRealtime || machine}
-                        isConnected={isConnected}
-                    />
-                </Grid>
+            {/* Main Grid Layout - Responsive */}
+            <Grid container spacing={{ xs: 2, sm: 2, md: 3 }}>
+                {/* Mobile: Collapsible Panel */}
+                {isMobile ? (
+                    <>
+                        {/* Collapse Button */}
+                        <Grid size={12}>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    p: 1.5,
+                                    bgcolor: 'background.paper',
+                                    borderRadius: 1,
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    cursor: 'pointer'
+                                }}
+                                onClick={() => setPanelExpanded(!panelExpanded)}
+                            >
+                                <Typography variant="subtitle1" fontWeight={600}>
+                                    📊 Thông tin máy & Trạng thái
+                                </Typography>
+                                <IconButton size="small">
+                                    {panelExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                </IconButton>
+                            </Box>
+                        </Grid>
 
-                {/* Right Column - Data Display */}
-                <Grid size={{ xs: 9.5, md: 9.5 }}>
-                    <SprayMachineDataDisplay
-                        dailyData={dailyData}
-                        statistics={statistics}
-                        loading={sprayLoading}
-                        error={sprayError}
-                    />
-                </Grid>
+                        {/* Collapsible Machine Panel */}
+                        <Grid size={12}>
+                            <Collapse in={panelExpanded} timeout="auto">
+                                <SprayMachinePanel
+                                    machine={machineRealtime || machine}
+                                    isConnected={isConnected}
+                                />
+                            </Collapse>
+                        </Grid>
+
+                        {/* Data Display - Always visible on mobile */}
+                        <Grid size={12}>
+                            <SprayMachineDataDisplay
+                                dailyData={dailyData}
+                                statistics={statistics}
+                                loading={sprayLoading}
+                                error={sprayError}
+                            />
+                        </Grid>
+                    </>
+                ) : (
+                    /* Desktop: Side-by-side layout */
+                    <>
+                        {/* Left Column - Machine Info & Panel */}
+                        <Grid size={{ xs: 12, md: 4, lg: 3.5 }}>
+                            <SprayMachinePanel
+                                machine={machineRealtime || machine}
+                                isConnected={isConnected}
+                            />
+                        </Grid>
+
+                        {/* Right Column - Data Display */}
+                        <Grid size={{ xs: 12, md: 8, lg: 8.5 }}>
+                            <SprayMachineDataDisplay
+                                dailyData={dailyData}
+                                statistics={statistics}
+                                loading={sprayLoading}
+                                error={sprayError}
+                            />
+                        </Grid>
+                    </>
+                )}
             </Grid>
 
-            {/* Footer Info */}
-            <Box sx={{ mt: 4, textAlign: 'center', py: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
-                    📊 Hiệu suất hôm nay: {todayEfficiency}%
+            {/* Footer Info - Responsive */}
+            <Box 
+                sx={{ 
+                    mt: { xs: 3, md: 4 }, 
+                    textAlign: 'center', 
+                    py: { xs: 1.5, md: 2 }, 
+                    borderTop: '1px solid', 
+                    borderColor: 'divider',
+                    px: { xs: 1, sm: 2 }
+                }}
+            >
+                <Typography 
+                    variant={isSmallMobile ? "caption" : "body2"} 
+                    color="text.secondary" 
+                    display="block" 
+                    sx={{ mb: 0.5 }}
+                >
+                    📊 Hiệu suất hôm nay: <strong>{todayEfficiency}%</strong>
                 </Typography>
-                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
-                    🔄 Dữ liệu được cập nhật tự động mỗi 5 giây
-                </Typography>
-                <Typography variant="caption" color="text.secondary" display="block">
+                
+                {!isSmallMobile && (
+                    <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
+                        🔄 Dữ liệu được cập nhật tự động mỗi 5 giây
+                    </Typography>
+                )}
+                
+                <Typography 
+                    variant="caption" 
+                    color="text.secondary" 
+                    display="block"
+                    sx={{ 
+                        fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                        wordBreak: 'break-word'
+                    }}
+                >
                     🕐 Cập nhật lần cuối: {(machineRealtime || machine)?.lastUpdate ? 
-                        new Date((machineRealtime || machine).lastUpdate).toLocaleString('vi-VN') : 
+                        new Date((machineRealtime || machine).lastUpdate).toLocaleString('vi-VN', {
+                            dateStyle: isSmallMobile ? 'short' : 'medium',
+                            timeStyle: 'short'
+                        }) : 
                         'Chưa có dữ liệu'}
                 </Typography>
             </Box>
 
-            {/* Quick Actions (Optional) */}
-            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 2 }}>
+            {/* Quick Actions - Responsive */}
+            <Box 
+                sx={{ 
+                    mt: { xs: 2, md: 3 }, 
+                    display: 'flex', 
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    justifyContent: 'center', 
+                    gap: { xs: 1.5, sm: 2 },
+                    px: { xs: 1, sm: 0 }
+                }}
+            >
                 <Button 
                     variant="outlined" 
                     onClick={refreshAllData}
                     disabled={sprayLoading}
+                    fullWidth={isSmallMobile}
+                    size={isSmallMobile ? "small" : "medium"}
+                    sx={{ minWidth: { sm: 150 } }}
                 >
-                    Làm mới tất cả
+                    {isSmallMobile ? "Làm mới" : "Làm mới tất cả"}
                 </Button>
                 <Button 
                     variant="outlined" 
                     onClick={refreshHistoricalData}
                     disabled={sprayLoading}
+                    fullWidth={isSmallMobile}
+                    size={isSmallMobile ? "small" : "medium"}
+                    sx={{ minWidth: { sm: 150 } }}
                 >
-                    Làm mới lịch sử
+                    {isSmallMobile ? "Lịch sử" : "Làm mới lịch sử"}
                 </Button>
             </Box>
         </Container>
