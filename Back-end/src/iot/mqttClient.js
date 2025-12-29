@@ -118,7 +118,7 @@ export const initializeMQTT = () => {
                 // Emit to all spray machines room
                 io.to('spray-machines').emit('spray:data-update', responseData);
                 
-                console.log(`📤 [Socket] Emitted update for ${machineId}`);
+                // console.log(`📤 [Socket] Emitted update for ${machineId}`);
 
             } catch (socketError) {
                 console.error(`⚠️  [Socket] Error emitting update: ${socketError.message}`);

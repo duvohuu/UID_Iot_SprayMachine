@@ -60,6 +60,17 @@ const SprayMachineDataDisplay = ({ dailyData, statistics, loading, error }) => {
         );
     };
 
+    // ==================== FORMAT DATE ====================
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+
+
     // ==================== LOADING STATE ====================
     if (loading) {
         return (
@@ -149,7 +160,7 @@ const SprayMachineDataDisplay = ({ dailyData, statistics, loading, error }) => {
             <Card sx={{ mb: 3 }}>
                 <CardContent>
                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', mb: 3 }}>
-                        📊 Thời gian hoạt động hôm nay (6h-18h)
+                        📊 Thời gian hoạt động hôm nay ({formatDate(dailyData.date)})
                     </Typography>
                     <Box sx={{ height: 300, position: 'relative' }}>
                         <Pie data={pieData} options={pieOptions} />

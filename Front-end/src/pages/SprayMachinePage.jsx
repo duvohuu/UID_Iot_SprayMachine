@@ -206,10 +206,7 @@ const SprayMachinePage = () => {
             {/* Main Grid Layout */}
             <Grid container spacing={3}>
                 {/* Left Column - Machine Info & Panel */}
-                <Grid item xs={12} md={4}>
-                    {/* Basic Info */}
-    
-
+                <Grid size={{ xs: 2.5, md: 2.5 }}>
                     {/* Spray Machine Panel */}
                     <SprayMachinePanel
                         machine={machineRealtime || machine}
@@ -218,7 +215,7 @@ const SprayMachinePage = () => {
                 </Grid>
 
                 {/* Right Column - Data Display */}
-                <Grid item xs={12} md={8}>
+                <Grid size={{ xs: 9.5, md: 9.5 }}>
                     <SprayMachineDataDisplay
                         dailyData={dailyData}
                         statistics={statistics}

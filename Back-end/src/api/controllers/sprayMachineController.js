@@ -7,11 +7,10 @@ import { getMQTTStatus } from '../../iot/mqttClient.js';
 export const getSprayRealtimeData = async (req, res) => {
     try {
         const { machineId } = req.params;
-        console.log(`📊 [Controller] GET Realtime for: ${machineId}`);
+        // console.log(`📊 [Controller] GET Realtime for: ${machineId}`);
         
         const todayData = await SprayMachineService.getLatestData(machineId);
         
-        // ✅ FIX: Lấy trực tiếp từ DB, KHÔNG dùng getCurrentActiveTime/getCurrentStopTime
         const realtimeData = {
             sprayStatus: todayData.lastStatus,
             pressure: 0,
@@ -19,8 +18,8 @@ export const getSprayRealtimeData = async (req, res) => {
             flowRate: 0,
             totalPaintUsed: 0,
             productCount: 0,
-            activeTime: parseFloat(todayData.activeTime.toFixed(2)),      // ← Lấy từ DB
-            stopTime: parseFloat(todayData.stopTime.toFixed(2)),          // ← Lấy từ DB
+            activeTime: parseFloat(todayData.activeTime.toFixed(2)),   
+            stopTime: parseFloat(todayData.stopTime.toFixed(2)),          
             energyConsumption: parseFloat(todayData.totalEnergyConsumed.toFixed(3)),
             errorCode: 0,
             operatorName: 'N/A',
@@ -28,7 +27,7 @@ export const getSprayRealtimeData = async (req, res) => {
             isConnected: true
         };
         
-        console.log(`📤 [Controller] Realtime response:`, {
+        // console.log(`📤 [Controller] Realtime response:`, {
             activeTime: realtimeData.activeTime,
             stopTime: realtimeData.stopTime,
             lastStatus: realtimeData.sprayStatus
@@ -52,7 +51,7 @@ export const getSprayRealtimeData = async (req, res) => {
 export const getSprayDailyData = async (req, res) => {
     try {
         const { machineId } = req.params;
-        console.log(`📅 [Controller] GET Daily for: ${machineId}`);
+        // console.log(`📅 [Controller] GET Daily for: ${machineId}`);
         
         const data = await SprayMachineService.getLatestData(machineId);
         
@@ -71,7 +70,7 @@ export const getSprayDailyData = async (req, res) => {
             current: 0
         };
         
-        console.log(`📤 [Controller] Daily response:`, {
+        // console.log(`📤 [Controller] Daily response:`, {
             operatingTime: dailyData.operatingTime,
             pausedTime: dailyData.pausedTime,
             efficiency: dailyData.efficiency
@@ -95,7 +94,7 @@ export const getSprayDailyData = async (req, res) => {
 export const getSpray30DaysHistory = async (req, res) => {
     try {
         const { machineId } = req.params;
-        console.log(`📜 [Controller] GET History for: ${machineId}`);
+        // console.log(`📜 [Controller] GET History for: ${machineId}`);
         
         const history = await SprayMachineService.get30DaysHistory(machineId);
         
@@ -126,7 +125,7 @@ export const getSpray30DaysHistory = async (req, res) => {
 export const getSprayStatistics = async (req, res) => {
     try {
         const { machineId } = req.params;
-        console.log(`📊 [Controller] GET Statistics for: ${machineId}`);
+        // console.log(`📊 [Controller] GET Statistics for: ${machineId}`);
         
         const stats = await SprayMachineService.getStatistics(machineId);
         
@@ -156,7 +155,7 @@ export const getSprayStatistics = async (req, res) => {
 export const getSprayPieChartData = async (req, res) => {
     try {
         const { machineId } = req.params;
-        console.log(`📊 [Controller] GET Pie Chart for: ${machineId}`);
+        // console.log(`📊 [Controller] GET Pie Chart for: ${machineId}`);
         
         const data = await SprayMachineService.getLatestData(machineId);
         
@@ -167,7 +166,7 @@ export const getSprayPieChartData = async (req, res) => {
             idleTime: 0
         };
         
-        console.log(`📤 [Controller] Pie Chart response:`, pieChartData);
+        // console.log(`📤 [Controller] Pie Chart response:`, pieChartData);
         
         res.json(pieChartData);
         
@@ -189,7 +188,7 @@ export const handleMQTTUpdate = async (req, res) => {
         const { machineId } = req.params;
         const { status, powerConsumption } = req.body;
         
-        console.log(`📨 [Controller] POST MQTT Update for: ${machineId}`, { status, powerConsumption });
+        // console.log(`📨 [Controller] POST MQTT Update for: ${machineId}`, { status, powerConsumption });
         
         if (typeof status !== 'number' || (status !== 0 && status !== 1)) {
             return res.status(400).json({
@@ -214,14 +213,13 @@ export const handleMQTTUpdate = async (req, res) => {
         
         await SprayMachineService.updateMachineConnectionStatus(machineId, true);
         
-        // ✅ FIX: Lấy trực tiếp từ DB
         res.json({
             success: true,
             message: 'MQTT data processed successfully',
             data: {
                 date: updatedData.date,
-                operatingTime: parseFloat(updatedData.activeTime.toFixed(2)),    // ← Lấy từ DB
-                pausedTime: parseFloat(updatedData.stopTime.toFixed(2)),         // ← Lấy từ DB
+                operatingTime: parseFloat(updatedData.activeTime.toFixed(2)),    
+                pausedTime: parseFloat(updatedData.stopTime.toFixed(2)),         
                 totalEnergyConsumed: parseFloat(updatedData.totalEnergyConsumed.toFixed(3)),
                 lastStatus: updatedData.lastStatus
             }
