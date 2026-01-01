@@ -12,8 +12,8 @@ import SprayMachinePage from './pages/SprayMachinePage';
 import { SnackbarProvider } from './context/SnackbarContext';
 import { SocketProvider } from './context/SocketContext';
 import axios from 'axios'; 
+import { API_URL } from './config/apiConfig.js';
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const App = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);

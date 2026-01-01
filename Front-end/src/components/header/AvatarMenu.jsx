@@ -21,8 +21,8 @@ import { styled, alpha } from "@mui/material/styles";
 import axios from "axios";
 import ChangePasswordDialog from "./ChangePasswordDialog";
 import { useSnackbar } from "../../context/SnackbarContext";
+import { API_URL } from '../../config/apiConfig.js';
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 // Enhanced Menu with glassmorphism
 const StyledMenu = styled(Menu)(({ theme }) => ({

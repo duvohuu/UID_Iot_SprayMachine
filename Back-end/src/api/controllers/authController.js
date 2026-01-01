@@ -36,22 +36,22 @@ const generateRefreshToken = (user) => {
  */
 export const login = async (req, res) => {
     try {
-        const { email, password } = req.body;  // ← Đổi username → email
+        const { email, password } = req.body; 
 
         // Validate input
-        if (!email || !password) {  // ← Đổi username → email
+        if (!email || !password) { 
             return res.status(400).json({
                 success: false,
-                message: 'Email và password là bắt buộc'  // ← Đổi message
+                message: 'Email và password là bắt buộc'  
             });
         }
 
         // Find user by email
-        const user = await User.findOne({ email }).select('+password');  // ← Đổi username → email
+        const user = await User.findOne({ email }).select('+password');  
         if (!user) {
             return res.status(401).json({
                 success: false,
-                message: 'Email hoặc password không đúng'  // ← Đổi message
+                message: 'Email hoặc password không đúng'  
             });
         }
 
@@ -60,7 +60,7 @@ export const login = async (req, res) => {
         if (!isPasswordValid) {
             return res.status(401).json({
                 success: false,
-                message: 'Email hoặc password không đúng'  // ← Đổi message
+                message: 'Email hoặc password không đúng' 
             });
         }
 
@@ -72,19 +72,18 @@ export const login = async (req, res) => {
         user.refreshToken = refreshToken;
         await user.save();
 
-        // ✅ Set cookies với SameSite: 'none' cho cross-origin
         res.cookie('accessToken', accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-            maxAge: 15 * 60 * 1000 // 15 minutes
+            maxAge: 15 * 60 * 1000 
         });
 
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+            maxAge: 7 * 24 * 60 * 60 * 1000 
         });
 
         console.log(`✅ User logged in: ${user.username} (${user.role})`);
@@ -122,14 +121,12 @@ export const logout = async (req, res) => {
         const { refreshToken } = req.cookies;
 
         if (refreshToken) {
-            // Remove refresh token from database
             await User.findOneAndUpdate(
                 { refreshToken },
                 { $unset: { refreshToken: 1 } }
             );
         }
 
-        // Clear cookies với options phù hợp
         res.clearCookie('accessToken', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
@@ -200,7 +197,6 @@ export const refreshToken = async (req, res) => {
         // Generate new access token
         const newAccessToken = generateAccessToken(user);
 
-        // ✅ FIX: Set new access token cookie với SameSite: 'none'
         res.cookie('accessToken', newAccessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',

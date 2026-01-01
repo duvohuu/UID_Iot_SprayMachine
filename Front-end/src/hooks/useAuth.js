@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import loginUser from "../api/loginUser";
 import { useSnackbar } from '../context/SnackbarContext';
+import { API_URL } from '../config/apiConfig.js';
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const useAuth = (setUser, socket) => {
     const [email, setEmail] = useState("");

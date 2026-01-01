@@ -22,17 +22,16 @@ const corsOrigins = process.env.CORS_ORIGINS
     : ['http://localhost:5173'];
 
 console.log('🌐 CORS Origins:', corsOrigins);
-console.log('🔒 NODE_ENV:', process.env.NODE_ENV);  // ← Thêm log
+console.log('🔒 NODE_ENV:', process.env.NODE_ENV); 
 
 app.use(cors({
     origin: corsOrigins, 
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-    exposedHeaders: ['Set-Cookie']  // ← Thêm dòng này để browser nhận được Set-Cookie header
+    exposedHeaders: ['Set-Cookie'] 
 }));
 
-// ✅ FIX: Handle preflight requests
 app.options('*', cors());
 
 app.use(express.json());

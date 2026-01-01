@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
+import { API_URL } from '../config/apiConfig.js'; 
+
 
 const SocketContext = createContext(null);
 
@@ -17,8 +19,6 @@ export const SocketProvider = ({ children, user }) => {
 
     useEffect(() => {
         if (!user) return;
-
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
         console.log('🔌 [SocketContext] Connecting to:', API_URL);
 

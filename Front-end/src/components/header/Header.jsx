@@ -19,10 +19,9 @@ import AvatarMenu from "../header/AvatarMenu";
 import NotificationBell from "../header/NotificationBell"
 import useAuth from "../../hooks/useAuth";
 import { useSocket } from "../../context/SocketContext";
+import { API_URL } from '../../config/apiConfig.js';
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-// Enhanced Search Component với gradient và glassmorphism
 const Search = styled("div")(({ theme }) => ({
     position: "relative",
     borderRadius: 25,
@@ -77,21 +76,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-// Enhanced Logo Container
-const LogoContainer = styled(Box)(({ theme }) => ({
-    display: "flex",
-    alignItems: "center",
-    transition: "all 0.3s ease",
-    cursor: "pointer",
-    padding: theme.spacing(0.5, 1),
-    borderRadius: 16,
-    "&:hover": {
-        background: alpha(theme.palette.primary.main, 0.05),
-        transform: "scale(1.02)",
-    },
-}));
-
-// Enhanced Menu Button
 const StyledMenuButton = styled(IconButton)(({ theme }) => ({
     marginRight: theme.spacing(2),
     padding: theme.spacing(1),
@@ -113,7 +97,6 @@ const StyledMenuButton = styled(IconButton)(({ theme }) => ({
     },
 }));
 
-// Enhanced Avatar
 const StyledAvatar = styled(Avatar)(({ theme }) => ({
     cursor: "pointer",
     width: 42,
@@ -143,7 +126,6 @@ const StyledAvatar = styled(Avatar)(({ theme }) => ({
     },
 }));
 
-// Enhanced Login Typography
 const LoginText = styled(Typography)(({ theme }) => ({
     cursor: "pointer",
     fontWeight: 600,
@@ -177,7 +159,6 @@ const LoginText = styled(Typography)(({ theme }) => ({
     },
 }));
 
-// Enhanced AppBar
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
     background: `linear-gradient(135deg, 
         ${alpha(theme.palette.background.paper, 0.95)} 0%, 
@@ -217,42 +198,16 @@ const Header = ({ onToggleSidebar, user, setUser }) => {
                     minHeight: "70px !important",
                     py: 1
                 }}>
+                    {/* Left Section - Menu Button + Logos */}
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                         <Grow in={true} timeout={800}>
                             <StyledMenuButton color="inherit" onClick={onToggleSidebar}>
                                 <MenuIcon />
                             </StyledMenuButton>
                         </Grow>
-                        
-                        <Fade in={true} timeout={1000}>
-                            <LogoContainer>
-                                <img 
-                                    src="/logo_1.png" 
-                                    alt="logo" 
-                                    style={{ 
-                                        width: 50, 
-                                        height: 50, 
-                                        marginRight: 12,
-                                        filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.1))"
-                                    }} 
-                                />
-                                <Typography 
-                                    variant="h5" 
-                                    sx={{
-                                        fontWeight: 700,
-                                        background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                                        backgroundClip: "text",
-                                        WebkitBackgroundClip: "text",
-                                        WebkitTextFillColor: "transparent",
-                                        letterSpacing: "0.5px",
-                                    }}
-                                >
-                                    UID LAB
-                                </Typography>
-                            </LogoContainer>
-                        </Fade>
                     </Box>
 
+                    {/* Right Section - Search + Notification + User */}
                     <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
                         <Fade in={true} timeout={1200}>
                             <Search>
@@ -266,7 +221,7 @@ const Header = ({ onToggleSidebar, user, setUser }) => {
                             </Search>
                         </Fade>
 
-                         <NotificationBell user={user} />
+                        <NotificationBell user={user} />
 
                         <Fade in={true} timeout={1400}>
                             <Box>
