@@ -1,4 +1,4 @@
-import { initializeDailyResetScheduler } from '../services/sprayMachineService.js'; 
+import { initializeDailyResetScheduler, initializeAllMachines } from '../services/sprayMachineService.js'; 
 import { 
     initializeMQTT, 
     disconnectMQTT, 
@@ -26,7 +26,7 @@ export const initializeServices = () => {
         mqttClient = initializeMQTT();
         
         // Log MQTT status sau 5s
-        setTimeout(() => {
+        setTimeout(async () => {
             const status = getMQTTStatus();
             console.log('📊 MQTT Status:', {
                 connected: status.connected,
@@ -39,6 +39,7 @@ export const initializeServices = () => {
                 restoreErrorTracking();
                 initializeTimeouts(); 
             }
+            await initializeAllMachines();
         }, 5000);
     }, 2000);
 
@@ -46,7 +47,7 @@ export const initializeServices = () => {
     setTimeout(() => {
         console.log('⏰ Starting Daily Reset Scheduler...');
         cronJob = initializeDailyResetScheduler();
-    }, 3000);
+    }, 7000);
     
     console.log('✅ All services initialization started\n');
 };

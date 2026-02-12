@@ -230,6 +230,31 @@ export const initializeDailyResetScheduler = () => {
 
     return cronJob;
 };
+
+export const initializeAllMachines = async () => {
+    try {
+        const machines = await getAllSprayMachines();
+        const today = getVietnamDateString();
+        
+        console.log(`\n🔧 [Init] Checking ${machines.length} machines for date: ${today}`);
+        
+        for (const machine of machines) {
+            const existingData = await getTodayData(machine.machineId);
+            
+            if (!existingData) {
+                console.log(`⚠️  [Init] ${machine.machineId}: Missing data for ${today} - Creating...`);
+                await resetDailyData(machine.machineId, 0);
+            } else {
+                console.log(`✅ [Init] ${machine.machineId}: Data exists for ${today}`);
+            }
+        }
+        
+        console.log(`✅ [Init] Initialization completed for ${machines.length} machines\n`);
+        
+    } catch (error) {
+        console.error('❌ [Init] Error initializing machines:', error.message);
+    }
+};
 // ==================== WRAPPER FUNCTIONS FOR CONTROLLER ====================
 
 /**

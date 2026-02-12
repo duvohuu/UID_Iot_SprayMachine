@@ -78,6 +78,23 @@ app.get('/', (req, res) => {
     });
 });
 
+app.get('/health', (req, res) => {
+    const vnNow = new Date(new Date().getTime() + (7 * 60 * 60 * 1000));
+    const vnDate = vnNow.toISOString().split('T')[0];
+    
+    // Log minimal để không spam console
+    console.log(`🏥 [Health] Ping from ${req.ip} at ${vnNow.toISOString()}`);
+    
+    // Trả về response nhanh
+    res.json({
+        status: 'alive',
+        timestamp: vnNow.toISOString(),
+        date: vnDate,
+        uptime: Math.floor(process.uptime()),
+        memory: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + 'MB'
+    });
+});
+
 // ==================== 404 HANDLER ====================
 app.use((req, res, next) => {
     res.status(404).json({
