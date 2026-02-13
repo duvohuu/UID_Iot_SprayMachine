@@ -1,4 +1,3 @@
-// filepath: /run/media/vhdu/WORK/Project/Project_11_UIDLab_IoTSprayMachine/Back-end/src/shared/utils/sprayMachine.util.js
 import { WORK_SHIFT, TIME_CONFIG } from '../constant/workShift.constant.js';
 
 /**
